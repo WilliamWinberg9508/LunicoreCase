@@ -1,6 +1,22 @@
 var fs = require('fs');
 const sqlite3 = require('sqlite3');
 var JSONFile = 'Data.json'
+let sqlCar = `SELECT   ID id,
+                        BRAND brand,
+                        MODEL model,
+                        PRICE price
+            FROM CARMODELS
+            ORDER BY ID`;
+    let sqlEmployee = `SELECT   ID id,
+                        NAME name
+            FROM EMPLOYEES
+            ORDER BY ID`;
+    
+    let sqlSales = `SELECT   ID id,
+                        EMPLOYEEID employee_id,
+                        CARMODELID carmodel_id
+            FROM SALES
+            ORDER BY ID`;
 let db = new sqlite3.Database('./carshopDataBase.db',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
         console.error(err.message);
@@ -13,12 +29,8 @@ let db = new sqlite3.Database('./carshopDataBase.db',sqlite3.OPEN_READWRITE, (er
 //in JSON format as a response
 function getEmployees(response, postData) {
     console.log("Request handler 'employees' was called.");
-    let sql = `SELECT   ID id,
-                        NAME name
-            FROM EMPLOYEES
-            ORDER BY ID`;
     var employees=[];
-    db.each(sql, (err, row)=> {
+    db.each(sqlEmployee, (err, row)=> {
             if(err) {
                 console.log(err);
             } else {
@@ -39,12 +51,6 @@ function getEmployees(response, postData) {
 //in JSON format as a response
 function getCarModels(response, postData) {
     console.log("Request handler 'carmodels' was called.");
-    let sqlCar = `SELECT   ID id,
-                        BRAND brand,
-                        MODEL model,
-                        PRICE price
-            FROM CARMODELS
-            ORDER BY ID`;
     carModels=[];
     db.each(sqlCar, (err, row)=> {
         if(err) {
@@ -65,26 +71,7 @@ function getCarModels(response, postData) {
 //Responds to a HTTP GET request, sends all employee parameters and total sales
 //value in JSON format as a response
 function getTotalSales(response, postData) {
-    console.log("Request handler 'total_sales' was called.");
-    let sqlCar = `SELECT   ID id,
-                        BRAND brand,
-                        MODEL model,
-                        PRICE price
-            FROM CARMODELS
-            ORDER BY ID`;
-    let sqlEmployee = `SELECT   ID id,
-                        NAME name
-            FROM EMPLOYEES
-            ORDER BY ID`;
-    
-    let sqlSales = `SELECT   ID id,
-                        EMPLOYEEID employee_id,
-                        CARMODELID carmodel_id
-            FROM SALES
-            ORDER BY ID`;
-    
-    
-    
+    console.log("Request handler 'total_sales' was called.");  
     db.serialize(()=> {
         var employees=[];
         var carModels=[];
@@ -139,42 +126,6 @@ function getTotalSales(response, postData) {
     
 })
 }
-
-    
-    
-
- 
-
-          
-
-    /*fs.readFile(JSONFile, 'utf8', function (err, fileData) {
-        if (err) {
-            console.log(err);
-        } else {
-            var Data=JSON.parse(fileData);
-            var employeeData=Data.carshop.employees;
-            var salesData=Data.carshop.sales;
-            var carData=Data.carshop.carmodels;
-            var totalSaleArray=[];
-            for(var i=0; i<employeeData.length; i++){
-                totalSaleArray[i]=0;
-            }
-            for (var i = 0; i < salesData.length; i++) { 
-                var sellerId=salesData[i].employee_id-1;
-                var carModelId=salesData[i].carmodel_id-1;
-                totalSaleArray[sellerId]=totalSaleArray[sellerId]+carData[carModelId].price;
-            };
-            for (var i = 0; i < employeeData.length; i++) {
-                employeeData[i]["sales"]= totalSaleArray[i];
-                }
-            }
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(JSON.stringify(employeeData));
-            response.end();
-            console.log("Response for GET /total_sales sent");
-        });
-        */
-
 
 //Responds to a HTTP POST request containing a carmodel in JSON format 
 //and writes it to ./carmodelData.json
