@@ -40,7 +40,6 @@ function getEmployees(response, postData) {
             if(err) {
                 console.log(err);
             } else {
-                console.log(employees);
                 response.writeHead(200, {'Content-Type': 'application/json'});
                 response.write(JSON.stringify(employees));
                 response.end();
@@ -107,11 +106,9 @@ function getTotalSales(response, postData) {
             }
             for (var i = 0; i < sales.length; i++) { 
                 var sellerId=sales[i].employee_id-1;
-                console.log(sellerId)
                 var carModelId=sales[i].carmodel_id-1;
-                console.log(typeof carModels[carModelId].price)
                 totalSaleArray[sellerId]=totalSaleArray[sellerId]+parseInt(carModels[carModelId].price,10)
-                console.log(carModels[carModelId].price)
+            
             };
 
             for (var i = 0; i < employees.length; i++) {
